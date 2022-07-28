@@ -15,19 +15,14 @@ namespace Notino.Utils
                 {
                     Serializer.Serialize(stream, record);
                     var ttt = stream.ToArray();
-                    return ByteArrayToString(stream.ToArray());
+                    return Encoding.Default.GetString(stream.ToArray());
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                // Log error
-                throw;
+                throw new Exception("serializace Proto3",ex);
             }
         }
 
-        private static string ByteArrayToString (byte[] bytes)
-        {
-            return Encoding.Default.GetString(bytes);
-        }
     }
 }
