@@ -1,4 +1,5 @@
 ﻿using ProtoBuf;
+using System.Text;
 
 namespace Notino.Utils
 {
@@ -26,9 +27,7 @@ namespace Notino.Utils
 
         private static string ByteArrayToString (byte[] bytes)
         {
-            char[] chars = new char[bytes.Length / sizeof(char)];
-            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
-            return new string(chars);
+            return Encoding.Default.GetString(bytes);
         }
     }
 }
