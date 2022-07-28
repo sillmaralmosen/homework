@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 
@@ -38,20 +36,6 @@ namespace Notino.Utils
                     throw new ArgumentOutOfRangeException();
                 case XmlSeverityType.Warning:
                     break;
-            }
-        }
-
-        public static bool IsValid(byte[] bytes)
-        {
-            try
-            {
-                using XmlReader reader = XmlReader.Create(new MemoryStream(bytes));
-                new XmlDocument().Load(reader);
-                return true;
-            }
-            catch
-            {
-                return false;
             }
         }
     }

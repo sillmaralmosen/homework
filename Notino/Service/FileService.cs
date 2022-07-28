@@ -18,20 +18,14 @@ namespace Notino.Services
         #region Implementation
         public async Task<FileContentResult> Download(DownloadFileRequest request)
         {
-            FileContentResult? output = null;
             var requestFile = Read(request);
-
-            if (requestFile != null)
-            {
-                var doc = await XmlRead(requestFile);
-                var export = SerializeObject(doc, request.Extension);
+            var doc = await XmlRead(requestFile);
+            var export = SerializeObject(doc, request.ExtensionExport);
       
-                byte[] bytes = Encoding.UTF8.GetBytes(export);
-                output = new FileContentResult(bytes, "application/octet-stream");
-                output.FileDownloadName =Path.GetFileNameWithoutExtension(requestFile.FileName)+"."+ request.Extension.ToString();
-            }
-            else
-                throw new Exception("Chyba načtení xml");
+            byte[] bytes = Encoding.UTF8.GetBytes(export);
+            var output = new FileContentResult(bytes, "application/octet-stream");
+
+            output.FileDownloadName =Path.GetFileNameWithoutExtension(requestFile.FileName) + "." + request.ExtensionExport.ToString();
 
             if (output == null)
                 throw new Exception("Chyba sestavení výstupu");
@@ -43,42 +37,41 @@ namespace Notino.Services
         {
             var requestFile = Read(request);
 
-            if (requestFile != null)
-            {
-                var doc = await XmlRead(requestFile);
-                var export = SerializeObject(doc, request.Extension);
+            var doc = await XmlRead(requestFile);
+            var export = SerializeObject(doc, request.ExtensionExport);
 
-                if (IsValidEmail(request.ExportPathEmail))
-                {
-                    // odesílání mailů Nástřel 
-                    MailMessage mail = new MailMessage();
-                    byte[] byteArray = Encoding.ASCII.GetBytes(export);
-                    var memStream = new MemoryStream(byteArray);
-                    memStream.Position = 0;
-                    var contentType = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
-                    var attachment = new Attachment(memStream, contentType);
-                    attachment.ContentDisposition.FileName = "download." + request.Extension.ToString();
-                    mail.Attachments.Add(attachment);
-                }
-                if (IsLocalPath(request.ExportPathEmail))
-                {
-                    File.WriteAllText(request.ExportPathEmail, export);
-                }
+            if (IsValidEmail(request.ExportPathEmail))
+            {
+                // odesílání mailů Nástřel 
+                MailMessage mail = new MailMessage();
+                byte[] byteArray = Encoding.ASCII.GetBytes(export);
+                var memStream = new MemoryStream(byteArray);
+                memStream.Position = 0;
+                var contentType = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
+                var attachment = new Attachment(memStream, contentType);
+                attachment.ContentDisposition.FileName = "download." + request.ExtensionExport.ToString();
+                mail.Attachments.Add(attachment);
             }
-            else
-                throw new Exception("chyba načtení xml");
+            if (IsLocalPath(request.ExportPathEmail))
+            {
+                File.WriteAllText(request.ExportPathEmail, export);
+            }
+    
         }
         #endregion
 
         #region Private Methods
-        private string SerializeObject (Document input, ExportExtensionEnum type)
+        private string SerializeObject (Document input, ExportExtension type)
         {
-            if (type== ExportExtensionEnum.json)
-                return JsonConvert.SerializeObject(input);
-            if (type == ExportExtensionEnum.proto3)
-                return ProtoSerializer.ProtoSerialize<Document>(input);
-            else
-                throw new Exception("chyba deserializace");
+            switch (type)
+            {
+                case ExportExtension.json:
+                    return JsonConvert.SerializeObject(input);
+                case ExportExtension.proto3:
+                    return ProtoSerializer.ProtoSerialize(input);
+                default:
+                    throw new Exception("chyba deserializace");
+            }
         }
 
         private async Task<Document> XmlRead(IFormFile file)
@@ -109,6 +102,8 @@ namespace Notino.Services
                 requestFile = LoadFilefromPath(request.ImportPathUrl);
             else if (request.File == null && !string.IsNullOrWhiteSpace(request.ImportPathUrl) && !IsLocalPath(request.ImportPathUrl))
                 requestFile = LoadFilefromUrl(request.ImportPathUrl);
+            else
+                throw new Exception("chyba načtení xml");
 
             return requestFile;
         }
@@ -119,9 +114,9 @@ namespace Notino.Services
             {
                 response = new WebClient().DownloadData(url);
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                throw new Exception("Chyba stahování", ex);
             }
 
             return ConvertFilefromByte(response);
@@ -136,9 +131,9 @@ namespace Notino.Services
                 var reader = new StreamReader(sourceStream);
                 input = reader.ReadToEnd();
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                throw new Exception("Chyba načítání", ex);
             }
 
             byte[] byteArray = Encoding.ASCII.GetBytes(input);
@@ -155,22 +150,20 @@ namespace Notino.Services
         {
             try
             { 
-            var targetStream = File.Open(destinationPath, FileMode.Create, FileAccess.Write);
-            var sw = new StreamWriter(targetStream);
-            sw.Write(serializedObject);
+                var targetStream = File.Open(destinationPath, FileMode.Create, FileAccess.Write);
+                var sw = new StreamWriter(targetStream);
+                sw.Write(serializedObject);
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                throw new Exception("Chyba ukládání", ex);
             }
         }
 
         private static bool IsLocalPath(string p)
         {
             if (p.StartsWith("http:\\"))
-            {
                 return false;
-            }
 
             return new Uri(p).IsFile;
         }
@@ -180,9 +173,8 @@ namespace Notino.Services
             var trimmedEmail = email.Trim();
 
             if (trimmedEmail.EndsWith("."))
-            {
                 return false; 
-            }
+
             try
             {
                 var addr = new System.Net.Mail.MailAddress(email);

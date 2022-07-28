@@ -15,11 +15,11 @@ namespace Notino.Controllers
             _fileService=fileService;
         }
 
-        [HttpPost("DownloadFile")]
+        [HttpPost("download")]
         public async Task<FileContentResult> Download([FromForm] DownloadFileRequest request) => await _fileService.Download(request);
 
 
-        [HttpPost("SendFile")]
+        [HttpPost("send")]
         public async Task Send([FromForm] SendFileRequest request) => await _fileService.Send(request);
 
 

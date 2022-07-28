@@ -13,8 +13,8 @@ namespace Notino.Model.Request
         public string? ImportPathUrl { get; set; }
 
         [Required]
-        [EnumDataType(typeof(ExportExtensionEnum))]
+        [EnumDataType(typeof(ExportExtension))]
         [JsonConverter(typeof(StringEnumConverter))]
-        public ExportExtensionEnum Extension { get; set; }
+        public ExportExtension ExtensionExport { get; set; }
     }
 }
