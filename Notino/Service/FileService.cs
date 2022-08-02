@@ -37,17 +37,10 @@ namespace Notino.Services
             var doc = await XmlRead(requestFile);
             var export = SerializeObject(doc, request.ExtensionExport);
 
-            if (IsValidEmail(request.ExportPathEmail))
+            if (EmailValidator.IsValidEmail(request.ExportPathEmail))
             {
-                // odesílání mailů Nástřel 
-                MailMessage mail = new MailMessage();
-                byte[] byteArray = Encoding.ASCII.GetBytes(export);
-                using var memStream = new MemoryStream(byteArray);
-                memStream.Position = 0;
-                var contentType = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
-                var attachment = new Attachment(memStream, contentType);
-                attachment.ContentDisposition.FileName = "download." + request.ExtensionExport.ToString();
-                mail.Attachments.Add(attachment);
+                // odesílání mailů ToDo 
+      
             }
             if (IsLocalPath(request.ExportPathEmail))
             {
@@ -73,7 +66,7 @@ namespace Notino.Services
 
         private async Task<Document> XmlRead(IFormFile file)
         {
-            XmlValidator.XmlByXsd(await file.GetBytesAsync());
+            XmlValidator.XmlByXsd(await file.GetBytesAsync(), "validace - schema", "validace.xsd");
 
             var serializer = new XmlSerializer(typeof(Document));
             var documentResponse = serializer.Deserialize(file.OpenReadStream());
@@ -128,24 +121,6 @@ namespace Notino.Services
                 return false;
 
             return new Uri(p).IsFile;
-        }
-
-        bool IsValidEmail(string email)
-        {
-            var trimmedEmail = email.Trim();
-
-            if (trimmedEmail.EndsWith("."))
-                return false; 
-
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == trimmedEmail;
-            }
-            catch
-            {
-                return false;
-            }
         }
         #endregion
     }

@@ -6,11 +6,10 @@ namespace Notino.Utils
 {
     public static class XmlValidator
     {
-        public static void XmlByXsd(byte[] bytes)
+        public static void XmlByXsd(byte[] bytes,string schema,string shemaName)
         {
             XmlSchemaSet xmlSchemaSet = new XmlSchemaSet();
-
-            xmlSchemaSet.Add("validace-schema", "validace.xsd");
+            xmlSchemaSet.Add(schema, shemaName);
 
             XmlReader reader = XmlReader.Create(new MemoryStream(bytes));
             XDocument source;
