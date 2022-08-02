@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Notino.Interface;
 using Notino.Model.Request;
+using Swashbuckle.Swagger.Annotations;
+using System.Net;
 
 namespace Notino.Controllers
 {
@@ -16,11 +18,33 @@ namespace Notino.Controllers
         }
 
         [HttpPost("download")]
-        public async Task<FileContentResult> Download([FromForm] DownloadFileRequest request) => await _fileService.Download(request);
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(FileContentResult))]
+        public async Task<IActionResult> Download([FromForm] DownloadFileRequest request)
+        {
+            try
+            {
+                return Ok(await _fileService.Download(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { errorMessage = ex.Message });
+            }
+        }
 
 
         [HttpPost("send")]
-        public async Task Send([FromForm] SendFileRequest request) => await _fileService.Send(request);
+        public async Task<IActionResult> Send([FromForm] SendFileRequest request)
+        {
+            try
+            {
+                await _fileService.Send(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { errorMessage = ex.Message });
+            }
+        }
 
 
     }

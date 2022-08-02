@@ -14,15 +14,9 @@ namespace Notino.Utils
 
             XmlReader reader = XmlReader.Create(new MemoryStream(bytes));
             XDocument source;
-            try
-            {
-                source = XDocument.Load(reader);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
+  
+            source = XDocument.Load(reader);
+  
             source.Validate(xmlSchemaSet, XmlByXsdValidationEventHandler!);
         }
 

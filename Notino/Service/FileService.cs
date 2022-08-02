@@ -25,10 +25,7 @@ namespace Notino.Services
             byte[] bytes = Encoding.UTF8.GetBytes(export);
             var output = new FileContentResult(bytes, "application/octet-stream");
 
-            output.FileDownloadName =Path.GetFileNameWithoutExtension(requestFile.FileName) + "." + request.ExtensionExport.ToString();
-
-            if (output == null)
-                throw new Exception("Chyba sestavení výstupu");
+            output.FileDownloadName = Path.GetFileNameWithoutExtension(requestFile.FileName) + "." + request.ExtensionExport.ToString();
 
             return output;
         }
@@ -45,7 +42,7 @@ namespace Notino.Services
                 // odesílání mailů Nástřel 
                 MailMessage mail = new MailMessage();
                 byte[] byteArray = Encoding.ASCII.GetBytes(export);
-                var memStream = new MemoryStream(byteArray);
+                using var memStream = new MemoryStream(byteArray);
                 memStream.Position = 0;
                 var contentType = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
                 var attachment = new Attachment(memStream, contentType);
@@ -70,20 +67,13 @@ namespace Notino.Services
                 case ExportExtension.proto3:
                     return ProtoSerializer.ProtoSerialize(input);
                 default:
-                    throw new Exception("chyba deserializace");
+                    return null;
             }
         }
 
         private async Task<Document> XmlRead(IFormFile file)
         {
-            try
-            {
-                XmlValidator.XmlByXsd(await file.GetBytesAsync());
-            }
-            catch (Exception)
-            {
-                throw new Exception("Vybraný soubor neodpovídá požadované struktuře.");
-            }
+            XmlValidator.XmlByXsd(await file.GetBytesAsync());
 
             var serializer = new XmlSerializer(typeof(Document));
             var documentResponse = serializer.Deserialize(file.OpenReadStream());
@@ -102,22 +92,14 @@ namespace Notino.Services
                 requestFile = LoadFilefromPath(request.ImportPathUrl);
             else if (request.File == null && !string.IsNullOrWhiteSpace(request.ImportPathUrl) && !IsLocalPath(request.ImportPathUrl))
                 requestFile = LoadFilefromUrl(request.ImportPathUrl);
-            else
-                throw new Exception("chyba načtení xml");
-
+   
             return requestFile;
         }
         private IFormFile LoadFilefromUrl(string url)
         {
             byte[] response;
-            try
-            {
-                response = new WebClient().DownloadData(url);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Chyba stahování", ex);
-            }
+
+            response = new WebClient().DownloadData(url);
 
             return ConvertFilefromByte(response);
         }
@@ -125,39 +107,19 @@ namespace Notino.Services
         private IFormFile LoadFilefromPath (string path)
         {
             string input;
-            try
-            {
-                FileStream sourceStream = File.Open(path, FileMode.Open);
-                var reader = new StreamReader(sourceStream);
-                input = reader.ReadToEnd();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Chyba načítání", ex);
-            }
 
+            using FileStream sourceStream = File.Open(path, FileMode.Open);
+            var reader = new StreamReader(sourceStream);
+            input = reader.ReadToEnd();
+  
             byte[] byteArray = Encoding.ASCII.GetBytes(input);
             return ConvertFilefromByte(byteArray, Path.GetFileName(path), path.Split(@"\").Last());
         }
 
         private IFormFile ConvertFilefromByte(byte[] byteArray, string filename = "download", string path = "download")
         {
-            Stream stream = new MemoryStream(byteArray);
+            using Stream stream = new MemoryStream(byteArray);
             return new FormFile(stream, 0, stream.Length, filename, path);
-        }
-
-        private void SaveFile (string serializedObject, string destinationPath)
-        {
-            try
-            { 
-                var targetStream = File.Open(destinationPath, FileMode.Create, FileAccess.Write);
-                var sw = new StreamWriter(targetStream);
-                sw.Write(serializedObject);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Chyba ukládání", ex);
-            }
         }
 
         private static bool IsLocalPath(string p)
