@@ -1,11 +1,10 @@
 ﻿using Homework.Model.Request;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Homework.Interface
+namespace Homework.Interface;
+
+public interface IFileService
 {
-    public interface IFileService
-    {
-        Task<FileContentResult> Download(DownloadFileRequest request);
-        Task Send(SendFileRequest request);
-    }
+    Task<FileContentResult> Download(DownloadFileRequest request);
+    Task Send(SendFileRequest request);
 }

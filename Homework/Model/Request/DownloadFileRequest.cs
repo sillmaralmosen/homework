@@ -1,20 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Converters;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Homework.Enums;
+using Newtonsoft.Json.Converters;
 
-namespace Homework.Model.Request
+namespace Homework.Model.Request;
+
+public class DownloadFileRequest
 {
-    public class DownloadFileRequest
-    {
-        [FileExtensions(Extensions = "xml")]
-        public IFormFile? File { get; set; }
-        public string? ImportPathUrl { get; set; }
+    [FileExtensions(Extensions = "xml")] public IFormFile? File { get; set; }
 
-        [Required]
-        [EnumDataType(typeof(ExportExtension))]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ExportExtension ExtensionExport { get; set; }
-    }
+    public string? ImportPathUrl { get; set; }
+
+    [Required]
+    [EnumDataType(typeof(ExportExtension))]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ExportExtension ExtensionExport { get; set; }
 }

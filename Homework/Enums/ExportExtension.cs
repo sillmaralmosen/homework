@@ -1,8 +1,7 @@
-﻿namespace Homework.Enums
+﻿namespace Homework.Enums;
+
+public enum ExportExtension
 {
-    public enum ExportExtension
-    {
-        json, 
-        proto3
-    }
+    json,
+    proto3
 }

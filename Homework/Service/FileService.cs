@@ -41,7 +41,8 @@ public class FileService : IFileService
             // odesílání mailů ToDo 
         }
 
-        if (PathExtension.IsLocalPath(request.ExportPathEmail)) await File.WriteAllTextAsync(request.ExportPathEmail, export);
+        if (PathExtension.IsLocalPath(request.ExportPathEmail))
+            await File.WriteAllTextAsync(request.ExportPathEmail, export);
     }
 
     #endregion
@@ -76,14 +77,14 @@ public class FileService : IFileService
     {
         if (request.File != null)
             return request.File;
-        else if (request.File == null && !string.IsNullOrWhiteSpace(request.ImportPathUrl) &&
-                 PathExtension.IsLocalPath(request.ImportPathUrl))
+        if (request.File == null && !string.IsNullOrWhiteSpace(request.ImportPathUrl) &&
+            PathExtension.IsLocalPath(request.ImportPathUrl))
             return FileExtension.LoadFromPath(request.ImportPathUrl);
-        else if (request.File == null && !string.IsNullOrWhiteSpace(request.ImportPathUrl) &&
-                 !PathExtension.IsLocalPath(request.ImportPathUrl))
+        if (request.File == null && !string.IsNullOrWhiteSpace(request.ImportPathUrl) &&
+            !PathExtension.IsLocalPath(request.ImportPathUrl))
             return FileExtension.LoadFromUrl(request.ImportPathUrl);
-        else
-            return null;
+        return null;
     }
+
     #endregion
 }

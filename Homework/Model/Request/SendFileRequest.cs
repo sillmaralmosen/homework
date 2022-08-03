@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Homework.Model.Request
+namespace Homework.Model.Request;
+
+public class SendFileRequest : DownloadFileRequest
 {
-    public class SendFileRequest : DownloadFileRequest
-    {
-        [Required]
-        public string ExportPathEmail { get; set; }
-    }
+    [Required] public string ExportPathEmail { get; set; }
 }

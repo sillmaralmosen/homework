@@ -1,28 +1,28 @@
-﻿using Microsoft.OpenApi.Any;
+﻿using System.Runtime.Serialization;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Runtime.Serialization;
 
-namespace Homework.Utils
+namespace Homework.Utils;
+
+public class EnumSchemaFilter : ISchemaFilter
 {
-    public class EnumSchemaFilter : ISchemaFilter
+    public void Apply(OpenApiSchema model, SchemaFilterContext context)
     {
-        public void Apply(OpenApiSchema model, SchemaFilterContext context)
+        if (context.Type.IsEnum)
         {
-            if (context.Type.IsEnum)
+            model.Enum.Clear();
+            foreach (var enumName in Enum.GetNames(context.Type))
             {
-                model.Enum.Clear();
-                foreach (string enumName in Enum.GetNames(context.Type)) 
-                {
-                    System.Reflection.MemberInfo memberInfo = context.Type.GetMember(enumName).FirstOrDefault(m => m.DeclaringType == context.Type);
-                    EnumMemberAttribute enumMemberAttribute = memberInfo == null
-                     ? null
-                     : memberInfo.GetCustomAttributes(typeof(EnumMemberAttribute), false).OfType<EnumMemberAttribute>().FirstOrDefault();
-                    string label = enumMemberAttribute == null || string.IsNullOrWhiteSpace(enumMemberAttribute.Value)
-                     ? enumName
-                     : enumMemberAttribute.Value;
-                    model.Enum.Add(new OpenApiString(label));
-                }
+                var memberInfo = context.Type.GetMember(enumName).FirstOrDefault(m => m.DeclaringType == context.Type);
+                var enumMemberAttribute = memberInfo == null
+                    ? null
+                    : memberInfo.GetCustomAttributes(typeof(EnumMemberAttribute), false).OfType<EnumMemberAttribute>()
+                        .FirstOrDefault();
+                var label = enumMemberAttribute == null || string.IsNullOrWhiteSpace(enumMemberAttribute.Value)
+                    ? enumName
+                    : enumMemberAttribute.Value;
+                model.Enum.Add(new OpenApiString(label));
             }
         }
     }
