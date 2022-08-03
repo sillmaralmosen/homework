@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System.Text;
 
-namespace Notino.Utils
+namespace Homework.Utils
 {
     public class ProtoSerializer
     {

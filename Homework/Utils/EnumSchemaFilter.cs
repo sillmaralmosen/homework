@@ -3,7 +3,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Runtime.Serialization;
 
-namespace Notino.Utils
+namespace Homework.Utils
 {
     public class EnumSchemaFilter : ISchemaFilter
     {

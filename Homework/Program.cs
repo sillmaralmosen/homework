@@ -1,6 +1,6 @@
-using Notino.Interface;
-using Notino.Services;
-using Notino.Utils;
+using Homework.Interface;
+using Homework.Services;
+using Homework.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

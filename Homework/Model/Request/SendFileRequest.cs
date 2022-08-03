@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Notino.Model.Request
+namespace Homework.Model.Request
 {
     public class SendFileRequest : DownloadFileRequest
     {

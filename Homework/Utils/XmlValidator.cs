@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using System.Xml.Schema;
 
-namespace Notino.Utils
+namespace Homework.Utils
 {
     public static class XmlValidator
     {

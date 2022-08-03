@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Notino.Interface;
-using Notino.Model.Request;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
+using Homework.Interface;
+using Homework.Model.Request;
 
-namespace Notino.Controllers
+namespace Homework.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

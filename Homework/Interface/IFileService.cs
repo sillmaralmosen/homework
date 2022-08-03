@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Notino.Model.Request;
+﻿using Homework.Model.Request;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Notino.Interface
+namespace Homework.Interface
 {
     public interface IFileService
     {

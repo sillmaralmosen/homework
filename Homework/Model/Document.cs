@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System.Xml.Serialization;
 
-namespace Notino.Model
+namespace Homework.Model
 {
     [XmlRoot("root")]
     [ProtoContract]

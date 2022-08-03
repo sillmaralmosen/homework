@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Converters;
-using Notino.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Homework.Enums;
 
-namespace Notino.Model.Request
+namespace Homework.Model.Request
 {
     public class DownloadFileRequest
     {

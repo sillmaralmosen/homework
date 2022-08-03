@@ -1,4 +1,4 @@
-﻿namespace Notino.Utils
+﻿namespace Homework.Utils
 {
     public static class EmailValidator
     {
